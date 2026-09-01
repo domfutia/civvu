@@ -61,6 +61,20 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Better touch feel on mobile */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area padding utilities for modern mobile screens (iPhone notch/pill) */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
+
+.bottom-safe {
+  bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem));
+}
+
 /* Utility to hide scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

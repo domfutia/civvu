@@ -38,16 +38,24 @@ import {
 
 interface SortableCardProps {
   exp: ExperienceItem;
+  index: number;
+  totalItems: number;
   onUpdate: (data: Partial<ExperienceItem>) => void;
   onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
 }
 
 const SortableExperienceCard: React.FC<SortableCardProps> = ({
   exp,
+  index,
+  totalItems,
   onUpdate,
   onRemove,
+  onMoveUp,
+  onMoveDown,
   t,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -91,9 +99,9 @@ const SortableExperienceCard: React.FC<SortableCardProps> = ({
   return (
     <div ref={setNodeRef} style={style} className="w-full">
       <Card className="transition-all duration-200 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-900/80">
-        {/* Header with drag handle and collapse */}
+        {/* Header with drag handle, move buttons and collapse */}
         <div className="flex items-center justify-between gap-2 pb-3 border-b border-neutral-200 dark:border-neutral-800/60">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <button
               type="button"
               {...attributes}
@@ -104,6 +112,29 @@ const SortableExperienceCard: React.FC<SortableCardProps> = ({
             >
               <GripVertical className="w-4 h-4" />
             </button>
+
+            {/* Quick Up/Down buttons for mobile touch */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                onClick={onMoveUp}
+                disabled={index === 0}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveUp}
+              >
+                <ChevronUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={onMoveDown}
+                disabled={index === totalItems - 1}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveDown}
+              >
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             <div className="truncate">
               <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate">
                 {exp.position || t.experience.positionPlaceholder}
@@ -343,14 +374,26 @@ export const ExperienceForm: React.FC = () => {
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-4">
-              {cvData.experiences.map((exp) => (
+              {cvData.experiences.map((exp, expIdx) => (
                 <SortableExperienceCard
                   key={exp.id}
                   exp={exp}
+                  index={expIdx}
+                  totalItems={cvData.experiences.length}
                   onUpdate={(data) => updateExperience(exp.id, data)}
                   onRemove={() => {
                     if (confirm(t.experience.deleteConfirm)) {
                       removeExperience(exp.id);
+                    }
+                  }}
+                  onMoveUp={() => {
+                    if (expIdx > 0) {
+                      reorderExperiences(arrayMove(cvData.experiences, expIdx, expIdx - 1));
+                    }
+                  }}
+                  onMoveDown={() => {
+                    if (expIdx < cvData.experiences.length - 1) {
+                      reorderExperiences(arrayMove(cvData.experiences, expIdx, expIdx + 1));
                     }
                   }}
                   t={t}

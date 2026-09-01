@@ -56,10 +56,16 @@ export const translations = {
       newSectionDefault: "Nuova Sezione",
     },
 
-    // Mobile bar
+    // Mobile bar & workflow helpers
     mobileViewEdit: "Modifica",
     mobileViewPreview: "Anteprima",
     mobilePrintTitle: "Stampa / Esporta PDF",
+    goToPreview: "Anteprima & Scarica PDF",
+    step: "Passo",
+    of: "di",
+    moreActions: "Altre opzioni",
+    moveUp: "Sposta su",
+    moveDown: "Sposta giù",
 
     // Personal Info Form
     personalInfo: {
@@ -391,10 +397,16 @@ export const translations = {
       newSectionDefault: "New Section",
     },
 
-    // Mobile bar
+    // Mobile bar & workflow helpers
     mobileViewEdit: "Edit",
     mobileViewPreview: "Preview",
     mobilePrintTitle: "Print / Export PDF",
+    goToPreview: "Preview & Download PDF",
+    step: "Step",
+    of: "of",
+    moreActions: "More options",
+    moveUp: "Move up",
+    moveDown: "Move down",
 
     // Personal Info Form
     personalInfo: {

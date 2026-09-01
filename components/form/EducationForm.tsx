@@ -36,16 +36,24 @@ import {
 
 interface SortableEducationCardProps {
   edu: EducationItem;
+  index: number;
+  totalItems: number;
   onUpdate: (data: Partial<EducationItem>) => void;
   onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
 }
 
 const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
   edu,
+  index,
+  totalItems,
   onUpdate,
   onRemove,
+  onMoveUp,
+  onMoveDown,
   t,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -70,7 +78,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
     <div ref={setNodeRef} style={style} className="w-full">
       <Card className="transition-all duration-200 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-900/80">
         <div className="flex items-center justify-between gap-2 pb-3 border-b border-neutral-200 dark:border-neutral-800/60">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <button
               type="button"
               {...attributes}
@@ -81,6 +89,29 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
             >
               <GripVertical className="w-4 h-4" />
             </button>
+
+            {/* Quick Up/Down buttons for mobile touch */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                onClick={onMoveUp}
+                disabled={index === 0}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveUp}
+              >
+                <ChevronUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={onMoveDown}
+                disabled={index === totalItems - 1}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveDown}
+              >
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             <div className="truncate">
               <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate">
                 {edu.degree || t.education.degreePlaceholder}
@@ -279,14 +310,26 @@ export const EducationForm: React.FC = () => {
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-4">
-              {cvData.educations.map((edu) => (
+              {cvData.educations.map((edu, eduIdx) => (
                 <SortableEducationCard
                   key={edu.id}
                   edu={edu}
+                  index={eduIdx}
+                  totalItems={cvData.educations.length}
                   onUpdate={(data) => updateEducation(edu.id, data)}
                   onRemove={() => {
                     if (confirm(t.education.deleteConfirm)) {
                       removeEducation(edu.id);
+                    }
+                  }}
+                  onMoveUp={() => {
+                    if (eduIdx > 0) {
+                      reorderEducations(arrayMove(cvData.educations, eduIdx, eduIdx - 1));
+                    }
+                  }}
+                  onMoveDown={() => {
+                    if (eduIdx < cvData.educations.length - 1) {
+                      reorderEducations(arrayMove(cvData.educations, eduIdx, eduIdx + 1));
                     }
                   }}
                   t={t}

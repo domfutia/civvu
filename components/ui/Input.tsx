@@ -97,8 +97,8 @@ export const Input: React.FC<InputProps> = ({
           disabled={disabled}
           placeholder={placeholder}
           className={cn(
-            "w-full rounded-lg bg-white dark:bg-neutral-900/70 border border-neutral-200 dark:border-neutral-800/90 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-2xs dark:shadow-none",
-            "py-2 px-3 text-sm tracking-tight transition-all duration-200",
+            "w-full rounded-lg bg-white dark:bg-neutral-900/70 border border-neutral-200 dark:border-neutral-800/90 text-[16px] sm:text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-2xs dark:shadow-none",
+            "py-2 sm:py-1.5 px-3 tracking-tight transition-all duration-200 min-h-[42px] sm:min-h-[36px]",
             "hover:border-neutral-300 dark:hover:border-neutral-700/90 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/90",
             "focus:outline-none focus:border-neutral-900 dark:focus:border-neutral-400 focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-neutral-400/15 focus:bg-white dark:focus:bg-neutral-950",
             "disabled:opacity-50 disabled:cursor-not-allowed",

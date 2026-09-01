@@ -39,6 +39,8 @@ import {
   ArrowRightLeft,
   Plus,
   PlusCircle,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { CVTemplate, CVFontSize, CVSpacing, SectionOrderConfig } from "@/types/cv";
 import { themePresets, defaultSectionOrder, standardSectionsMeta } from "@/data/initialCV";
@@ -47,19 +49,27 @@ import { cn } from "@/lib/utils";
 // Sortable row component with editable section label, visibility, column mover and delete
 const SortableSectionItem: React.FC<{
   section: SectionOrderConfig;
+  index?: number;
+  totalItems?: number;
   isModernTemplate: boolean;
   onToggleVisibility: () => void;
   onUpdateLabel: (newLabel: string) => void;
   onMoveColumn?: (newColumn: "main" | "sidebar") => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   onDelete: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
 }> = ({
   section,
+  index,
+  totalItems,
   isModernTemplate,
   onToggleVisibility,
   onUpdateLabel,
   onMoveColumn,
+  onMoveUp,
+  onMoveDown,
   onDelete,
   t,
 }) => {
@@ -96,13 +106,13 @@ const SortableSectionItem: React.FC<{
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center justify-between p-2.5 rounded-lg border transition-all select-none gap-2",
+        "flex items-center justify-between p-2 sm:p-2.5 rounded-lg border transition-all select-none gap-2",
         section.isVisible
           ? "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200"
           : "bg-neutral-100/60 dark:bg-neutral-950/60 border-neutral-200/60 dark:border-neutral-800/40 text-neutral-400 dark:text-neutral-600"
       )}
     >
-      <div className="flex items-center gap-2 flex-1 min-w-0">
+      <div className="flex items-center gap-1.5 flex-1 min-w-0">
         <button
           type="button"
           {...attributes}
@@ -112,6 +122,30 @@ const SortableSectionItem: React.FC<{
         >
           <GripVertical className="w-4 h-4" />
         </button>
+
+        {/* Quick Up/Down buttons for touch devices */}
+        {onMoveUp && onMoveDown && index !== undefined && totalItems !== undefined && (
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              disabled={index === 0}
+              className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              title={t.moveUp}
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={onMoveDown}
+              disabled={index === totalItems - 1}
+              className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              title={t.moveDown}
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {isEditing ? (
           <div className="flex items-center gap-1.5 flex-1 max-w-xs">
@@ -455,14 +489,40 @@ export const SettingsForm: React.FC = () => {
                               Empty
                             </p>
                           ) : (
-                            sidebarSections.map((section) => (
+                            sidebarSections.map((section, sIdx) => (
                               <SortableSectionItem
                                 key={section.id}
                                 section={section}
+                                index={sIdx}
+                                totalItems={sidebarSections.length}
                                 isModernTemplate={true}
                                 onToggleVisibility={() => toggleSectionVisibility(section.key)}
                                 onUpdateLabel={(newLabel) => updateSectionLabel(section.key, newLabel)}
                                 onMoveColumn={(col) => moveSectionColumn(section.key, col)}
+                                onMoveUp={() => {
+                                  if (sIdx > 0) {
+                                    const reorderedSub = arrayMove(sidebarSections, sIdx, sIdx - 1);
+                                    const newGlobal = sectionsList.map((s) => {
+                                      if (s.column === "sidebar") {
+                                        return reorderedSub.shift() || s;
+                                      }
+                                      return s;
+                                    });
+                                    updateSectionOrder(newGlobal);
+                                  }
+                                }}
+                                onMoveDown={() => {
+                                  if (sIdx < sidebarSections.length - 1) {
+                                    const reorderedSub = arrayMove(sidebarSections, sIdx, sIdx + 1);
+                                    const newGlobal = sectionsList.map((s) => {
+                                      if (s.column === "sidebar") {
+                                        return reorderedSub.shift() || s;
+                                      }
+                                      return s;
+                                    });
+                                    updateSectionOrder(newGlobal);
+                                  }
+                                }}
                                 onDelete={() => deleteSection(section.key)}
                                 t={t}
                               />
@@ -502,14 +562,40 @@ export const SettingsForm: React.FC = () => {
                               Empty
                             </p>
                           ) : (
-                            mainSections.map((section) => (
+                            mainSections.map((section, mIdx) => (
                               <SortableSectionItem
                                 key={section.id}
                                 section={section}
+                                index={mIdx}
+                                totalItems={mainSections.length}
                                 isModernTemplate={true}
                                 onToggleVisibility={() => toggleSectionVisibility(section.key)}
                                 onUpdateLabel={(newLabel) => updateSectionLabel(section.key, newLabel)}
                                 onMoveColumn={(col) => moveSectionColumn(section.key, col)}
+                                onMoveUp={() => {
+                                  if (mIdx > 0) {
+                                    const reorderedSub = arrayMove(mainSections, mIdx, mIdx - 1);
+                                    const newGlobal = sectionsList.map((s) => {
+                                      if (s.column !== "sidebar") {
+                                        return reorderedSub.shift() || s;
+                                      }
+                                      return s;
+                                    });
+                                    updateSectionOrder(newGlobal);
+                                  }
+                                }}
+                                onMoveDown={() => {
+                                  if (mIdx < mainSections.length - 1) {
+                                    const reorderedSub = arrayMove(mainSections, mIdx, mIdx + 1);
+                                    const newGlobal = sectionsList.map((s) => {
+                                      if (s.column !== "sidebar") {
+                                        return reorderedSub.shift() || s;
+                                      }
+                                      return s;
+                                    });
+                                    updateSectionOrder(newGlobal);
+                                  }
+                                }}
                                 onDelete={() => deleteSection(section.key)}
                                 t={t}
                               />
@@ -534,13 +620,25 @@ export const SettingsForm: React.FC = () => {
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="space-y-2">
-                      {sectionsList.map((section) => (
+                      {sectionsList.map((section, gIdx) => (
                         <SortableSectionItem
                           key={section.id}
                           section={section}
+                          index={gIdx}
+                          totalItems={sectionsList.length}
                           isModernTemplate={false}
                           onToggleVisibility={() => toggleSectionVisibility(section.key)}
                           onUpdateLabel={(newLabel) => updateSectionLabel(section.key, newLabel)}
+                          onMoveUp={() => {
+                            if (gIdx > 0) {
+                              updateSectionOrder(arrayMove(sectionsList, gIdx, gIdx - 1));
+                            }
+                          }}
+                          onMoveDown={() => {
+                            if (gIdx < sectionsList.length - 1) {
+                              updateSectionOrder(arrayMove(sectionsList, gIdx, gIdx + 1));
+                            }
+                          }}
                           onDelete={() => deleteSection(section.key)}
                           t={t}
                         />

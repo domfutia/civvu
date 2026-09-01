@@ -13,7 +13,7 @@ export default function Home() {
   const [mobileView, setMobileView] = useState<"form" | "preview">("form");
 
   const handlePrint = () => {
-    // Ensure preview is active on mobile so print engine has the full rendered tree
+    // Ensure preview is active on mobile so user sees the preview if print dialog closes
     if (mobileView === "form") {
       setMobileView("preview");
     }
@@ -24,16 +24,19 @@ export default function Home() {
     const prevTitle = document.title;
     document.title = fileName;
 
-    setTimeout(() => {
-      window.print();
+    // Trigger print
+    requestAnimationFrame(() => {
       setTimeout(() => {
-        document.title = prevTitle;
-      }, 1000);
-    }, 150);
+        window.print();
+        setTimeout(() => {
+          document.title = prevTitle;
+        }, 1000);
+      }, 50);
+    });
   };
 
   return (
-    <div id="app-root" className="h-full max-h-full w-full flex flex-col overflow-hidden bg-neutral-50 dark:bg-[#09090b] transition-colors duration-200">
+    <div id="app-root" className="h-full max-h-full min-h-[100dvh] max-h-[100dvh] w-full flex flex-col overflow-hidden bg-neutral-50 dark:bg-[#09090b] transition-colors duration-200">
       {/* Top Navigation Bar */}
       <Navbar />
 
@@ -47,7 +50,7 @@ export default function Home() {
             mobileView === "form" ? "flex" : "hidden lg:flex"
           )}
         >
-          <FormPanel />
+          <FormPanel onGoToPreview={() => setMobileView("preview")} />
         </section>
 
         {/* Right Column: Live Preview Panel */}
@@ -62,13 +65,13 @@ export default function Home() {
         </section>
 
         {/* Mobile Floating Action Bar (Pill on bottom) */}
-        <div className="no-print lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl p-1.5 rounded-full border border-neutral-300 dark:border-neutral-700 shadow-2xl shadow-black/30 flex items-center gap-1.5">
+        <div className="no-print lg:hidden fixed bottom-safe left-1/2 -translate-x-1/2 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl p-1.5 rounded-full border border-neutral-300/80 dark:border-neutral-700/80 shadow-2xl shadow-black/25 flex items-center gap-1.5 select-none">
           <button
             type="button"
             onClick={() => setMobileView("form")}
             aria-label={t.mobileViewEdit}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer",
+              "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer min-h-[36px]",
               mobileView === "form"
                 ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs"
                 : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -83,7 +86,7 @@ export default function Home() {
             onClick={() => setMobileView("preview")}
             aria-label={t.mobileViewPreview}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer",
+              "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer min-h-[36px]",
               mobileView === "preview"
                 ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-xs"
                 : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -99,7 +102,7 @@ export default function Home() {
             type="button"
             onClick={handlePrint}
             aria-label={t.mobilePrintTitle}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+            className="flex items-center justify-center w-9 h-9 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs shrink-0"
             title={t.mobilePrintTitle}
           >
             <Printer className="w-3.5 h-3.5" />

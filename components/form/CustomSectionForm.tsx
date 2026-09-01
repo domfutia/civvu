@@ -38,16 +38,24 @@ import {
 
 interface SortableCustomItemProps {
   item: CustomSectionItem;
+  index: number;
+  totalItems: number;
   onUpdate: (data: Partial<CustomSectionItem>) => void;
   onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
 }
 
 const SortableCustomItemCard: React.FC<SortableCustomItemProps> = ({
   item,
+  index,
+  totalItems,
   onUpdate,
   onRemove,
+  onMoveUp,
+  onMoveDown,
   t,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -92,7 +100,7 @@ const SortableCustomItemCard: React.FC<SortableCustomItemProps> = ({
     <div ref={setNodeRef} style={style} className="w-full">
       <Card className="transition-all duration-200 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-900/80">
         <div className="flex items-center justify-between gap-2 pb-3 border-b border-neutral-200 dark:border-neutral-800/60">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <button
               type="button"
               {...attributes}
@@ -103,6 +111,29 @@ const SortableCustomItemCard: React.FC<SortableCustomItemProps> = ({
             >
               <GripVertical className="w-4 h-4" />
             </button>
+
+            {/* Quick Up/Down buttons for mobile touch */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                onClick={onMoveUp}
+                disabled={index === 0}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveUp}
+              >
+                <ChevronUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={onMoveDown}
+                disabled={index === totalItems - 1}
+                className="p-1 text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 disabled:opacity-25 disabled:pointer-events-none rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                title={t.moveDown}
+              >
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             <div className="truncate">
               <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate">
                 {item.title || t.customSection.itemTitlePlaceholder}
@@ -400,12 +431,30 @@ export const CustomSectionForm: React.FC<{ section: CustomSection }> = ({ sectio
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-4">
-              {section.items.map((item) => (
+              {section.items.map((item, itemIdx) => (
                 <SortableCustomItemCard
                   key={item.id}
                   item={item}
+                  index={itemIdx}
+                  totalItems={section.items.length}
                   onUpdate={(data) => updateCustomSectionItem(section.id, item.id, data)}
                   onRemove={() => removeCustomSectionItem(section.id, item.id)}
+                  onMoveUp={() => {
+                    if (itemIdx > 0) {
+                      reorderCustomSectionItems(
+                        section.id,
+                        arrayMove(section.items, itemIdx, itemIdx - 1)
+                      );
+                    }
+                  }}
+                  onMoveDown={() => {
+                    if (itemIdx < section.items.length - 1) {
+                      reorderCustomSectionItems(
+                        section.id,
+                        arrayMove(section.items, itemIdx, itemIdx + 1)
+                      );
+                    }
+                  }}
                   t={t}
                 />
               ))}

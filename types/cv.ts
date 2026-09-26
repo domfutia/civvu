@@ -43,6 +43,7 @@ export interface ProjectItem {
   startDate?: string;
   endDate?: string;
   isCurrent?: boolean;
+  date?: string;
   description: string;
   link?: string;
   technologies: string[];

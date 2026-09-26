@@ -118,7 +118,11 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
                 {edu.institution ? ` • ${edu.institution}` : ""}
               </h4>
               <p className="text-xs text-neutral-500 truncate">
-                {edu.startDate || "Start"} — {edu.isCurrent ? (t.docLabels.present || "In progress") : edu.endDate || (t.docLabels.present || "Graduated")}
+                {edu.isCurrent
+                  ? (edu.startDate ? `${edu.startDate} — ${t.docLabels.present || "In progress"}` : (t.docLabels.present || "In progress"))
+                  : (edu.startDate && edu.endDate)
+                  ? `${edu.startDate} — ${edu.endDate}`
+                  : (edu.startDate || edu.endDate || "")}
               </p>
             </div>
           </div>

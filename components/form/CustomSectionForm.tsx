@@ -141,9 +141,11 @@ const SortableCustomItemCard: React.FC<SortableCustomItemProps> = ({
               </h4>
               {(item.startDate || item.endDate || item.isCurrent || item.date) && (
                 <p className="text-xs text-neutral-500 truncate">
-                  {item.startDate
-                    ? `${item.startDate} — ${item.isCurrent ? (t.docLabels.present || "In corso") : item.endDate || (t.docLabels.present || "Presente")}`
-                    : item.date}
+                  {item.isCurrent
+                    ? (item.startDate || item.date ? `${item.startDate || item.date} — ${t.docLabels.present || "In corso"}` : (t.docLabels.present || "In corso"))
+                    : ((item.startDate || item.date) && item.endDate)
+                    ? `${item.startDate || item.date} — ${item.endDate}`
+                    : (item.startDate || item.date || item.endDate || "")}
                 </p>
               )}
             </div>

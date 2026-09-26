@@ -214,9 +214,13 @@ export const CVDocument: React.FC<{
             <h3 className="text-xs font-bold uppercase tracking-wider pb-1 border-b" style={{ color: sbTextPrimary, borderColor: sbBorderColor }}>{title}</h3>
             <div className="space-y-1.5 text-xs">
               {matchingCustom.items.map((item) => {
-                const dateStr = item.startDate
-                  ? `${item.startDate} — ${item.isCurrent ? (t.docLabels.present || "Presente") : item.endDate || (t.docLabels.present || "Presente")}`
-                  : item.date || "";
+                const itemStart = item.startDate || item.date || "";
+                const itemEnd = item.endDate || "";
+                const dateStr = item.isCurrent
+                  ? (itemStart ? `${itemStart} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                  : (itemStart && itemEnd)
+                  ? `${itemStart} — ${itemEnd}`
+                  : (itemStart || itemEnd || "");
                 return (
                   <div key={item.id} className="space-y-0.5">
                     <div className="font-semibold break-words leading-snug" style={{ color: sbTextPrimary }}>{item.title}</div>
@@ -239,9 +243,13 @@ export const CVDocument: React.FC<{
           <h2 className="text-xs font-bold uppercase tracking-widest pb-1 border-b border-black/10" style={{ color: accentColor }}>{title}</h2>
           <div className={itemSpacingClasses}>
             {matchingCustom.items.map((item) => {
-              const dateStr = item.startDate
-                ? `${item.startDate} — ${item.isCurrent ? (t.docLabels.present || "Presente") : item.endDate || (t.docLabels.present || "Presente")}`
-                : item.date || "";
+              const itemStart = item.startDate || item.date || "";
+              const itemEnd = item.endDate || "";
+              const dateStr = item.isCurrent
+                ? (itemStart ? `${itemStart} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                : (itemStart && itemEnd)
+                ? `${itemStart} — ${itemEnd}`
+                : (itemStart || itemEnd || "");
               return (
                 <div key={item.id} className="break-inside-avoid page-break-inside-avoid space-y-0.5">
                   <div className="flex items-baseline justify-between gap-4 flex-wrap">
@@ -324,7 +332,13 @@ export const CVDocument: React.FC<{
                       <span className="font-bold text-[12.5px] break-words" style={{ color: primaryTextColor }}>{edu.degree}</span>
                       {edu.institution && <span className="font-medium ml-1.5 break-words" style={{ color: secondaryTextColor }}>• {edu.institution}</span>}
                     </div>
-                    <span className="text-xs font-mono shrink-0 opacity-80" style={{ color: secondaryTextColor }}>{edu.startDate} — {edu.isCurrent ? (t.docLabels.present || "In corso") : edu.endDate}</span>
+                    <span className="text-xs font-mono shrink-0 opacity-80" style={{ color: secondaryTextColor }}>
+                      {edu.isCurrent
+                        ? (edu.startDate ? `${edu.startDate} — ${t.docLabels.present || "In corso"}` : (t.docLabels.present || "In corso"))
+                        : (edu.startDate && edu.endDate)
+                        ? `${edu.startDate} — ${edu.endDate}`
+                        : (edu.startDate || edu.endDate || "")}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs flex-wrap" style={{ color: secondaryTextColor }}>
                     {edu.fieldOfStudy && <span className="break-words">{edu.fieldOfStudy}</span>}
@@ -428,9 +442,13 @@ export const CVDocument: React.FC<{
               <h3 className="text-xs font-bold uppercase tracking-wider pb-1 border-b" style={{ color: sbTextPrimary, borderColor: sbBorderColor }}>{getSectionTitle("certifications", t.docLabels.certifications || "Certificazioni")}</h3>
               <div className="space-y-1 text-xs">
                 {certifications.map((c) => {
-                  const dateStr = c.startDate
-                    ? `${c.startDate} — ${c.isCurrent ? (t.docLabels.present || "Presente") : c.endDate || (t.docLabels.present || "Presente")}`
-                    : c.date || "";
+                  const certStart = c.startDate || c.date || "";
+                  const certEnd = c.endDate || "";
+                  const dateStr = c.isCurrent
+                    ? (certStart ? `${certStart} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                    : (certStart && certEnd)
+                    ? `${certStart} — ${certEnd}`
+                    : (certStart || certEnd || "");
                   return (
                     <div key={c.id} className="space-y-0.5">
                       <div className="font-semibold break-words leading-tight text-[11px]" style={{ color: sbTextPrimary }}>{c.name}</div>
@@ -447,9 +465,13 @@ export const CVDocument: React.FC<{
             <h3 className="text-xs font-bold uppercase tracking-widest pb-0.5 border-b border-black/10" style={{ color: accentColor }}>{getSectionTitle("certifications", t.docLabels.certifications || "Certificazioni")}</h3>
             <div className="space-y-1 text-xs" style={{ color: bodyTextColor }}>
               {certifications.map((c) => {
-                const dateStr = c.startDate
-                  ? `${c.startDate} — ${c.isCurrent ? (t.docLabels.present || "Presente") : c.endDate || (t.docLabels.present || "Presente")}`
-                  : c.date || "";
+                const certStart = c.startDate || c.date || "";
+                const certEnd = c.endDate || "";
+                const dateStr = c.isCurrent
+                  ? (certStart ? `${certStart} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                  : (certStart && certEnd)
+                  ? `${certStart} — ${certEnd}`
+                  : (certStart || certEnd || "");
                 return (
                   <div key={c.id} className="flex justify-between gap-2 flex-wrap text-[11px]">
                     <span className="font-semibold break-words" style={{ color: primaryTextColor }}>{c.name}</span>
@@ -471,9 +493,13 @@ export const CVDocument: React.FC<{
               <h3 className="text-xs font-bold uppercase tracking-wider pb-1 border-b" style={{ color: sbTextPrimary, borderColor: sbBorderColor }}>{getSectionTitle("projects", t.docLabels.projects || "Progetti")}</h3>
               <div className="space-y-1.5 text-xs">
                 {projects.map((p) => {
-                  const dateStr = p.startDate
-                    ? `${p.startDate} — ${p.isCurrent ? (t.docLabels.present || "Presente") : p.endDate || (t.docLabels.present || "Presente")}`
-                    : "";
+                  const start = p.startDate || p.date || "";
+                  const end = p.endDate || "";
+                  const dateStr = p.isCurrent
+                    ? (start ? `${start} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                    : (start && end)
+                    ? `${start} — ${end}`
+                    : (start || end || "");
                   return (
                     <div key={p.id} className="space-y-0.5">
                       <div className="font-semibold break-words leading-tight text-[11px]" style={{ color: sbTextPrimary }}>
@@ -492,9 +518,13 @@ export const CVDocument: React.FC<{
             <h2 className="text-xs font-bold uppercase tracking-widest pb-1 border-b border-black/10" style={{ color: accentColor }}>{getSectionTitle("projects", t.docLabels.projects || "Progetti di Rilievo")}</h2>
             <div className="grid grid-cols-1 gap-1.5">
               {projects.map((p) => {
-                const dateStr = p.startDate
-                  ? `${p.startDate} — ${p.isCurrent ? (t.docLabels.present || "Presente") : p.endDate || (t.docLabels.present || "Presente")}`
-                  : "";
+                const start = p.startDate || p.date || "";
+                const end = p.endDate || "";
+                const dateStr = p.isCurrent
+                  ? (start ? `${start} — ${t.docLabels.present || "Presente"}` : (t.docLabels.present || "Presente"))
+                  : (start && end)
+                  ? `${start} — ${end}`
+                  : (start || end || "");
                 return (
                   <div key={p.id} className="text-xs space-y-0.5">
                     <div className="flex items-baseline justify-between flex-wrap gap-2">

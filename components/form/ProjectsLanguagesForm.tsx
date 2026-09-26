@@ -157,9 +157,15 @@ export const ProjectsLanguagesForm: React.FC = () => {
                   <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
                     {proj.name || t.projectsLanguages.projectNamePlaceholder}
                   </h4>
-                  {(proj.startDate || proj.endDate || proj.isCurrent) && (
+                  {(proj.startDate || proj.endDate || proj.isCurrent || proj.date) && (
                     <p className="text-xs text-neutral-500 truncate">
-                      {proj.startDate || "Start"} — {proj.isCurrent ? (t.docLabels.present || "In corso") : proj.endDate || (t.docLabels.present || "Presente")}
+                      {proj.isCurrent
+                        ? (proj.startDate || proj.date
+                            ? `${proj.startDate || proj.date} — ${t.docLabels.present || "In corso"}`
+                            : (t.docLabels.present || "In corso"))
+                        : ((proj.startDate || proj.date) && proj.endDate)
+                        ? `${proj.startDate || proj.date} — ${proj.endDate}`
+                        : (proj.startDate || proj.date || proj.endDate || "")}
                     </p>
                   )}
                 </div>
@@ -192,8 +198,8 @@ export const ProjectsLanguagesForm: React.FC = () => {
                 <Input
                   label={t.projectsLanguages.startDate}
                   placeholder={t.projectsLanguages.startDatePlaceholder}
-                  value={proj.startDate || ""}
-                  onChange={(val) => updateProject(proj.id, { startDate: val })}
+                  value={proj.startDate || proj.date || ""}
+                  onChange={(val) => updateProject(proj.id, { startDate: val, date: val })}
                 />
                 <Input
                   label={t.projectsLanguages.endDate}
@@ -321,9 +327,11 @@ export const ProjectsLanguagesForm: React.FC = () => {
                   </h5>
                   {(cert.startDate || cert.endDate || cert.isCurrent || cert.date) && (
                     <p className="text-[11px] text-neutral-500 truncate">
-                      {cert.startDate
-                        ? `${cert.startDate} — ${cert.isCurrent ? (t.docLabels.present || "Attiva") : cert.endDate || (t.docLabels.present || "Presente")}`
-                        : cert.date || ""}
+                      {cert.isCurrent
+                        ? (cert.startDate || cert.date ? `${cert.startDate || cert.date} — ${t.docLabels.present || "Attiva"}` : (t.docLabels.present || "Attiva"))
+                        : ((cert.startDate || cert.date) && cert.endDate)
+                        ? `${cert.startDate || cert.date} — ${cert.endDate}`
+                        : (cert.startDate || cert.date || cert.endDate || "")}
                     </p>
                   )}
                 </div>

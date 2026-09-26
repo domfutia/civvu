@@ -392,6 +392,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       startDate: "",
       endDate: "",
       isCurrent: false,
+      date: "",
       description: "",
       link: "",
       technologies: [],
